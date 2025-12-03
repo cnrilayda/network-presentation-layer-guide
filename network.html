@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L6 Presentation Layer - Network Issues Admin Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2em;
+        }
+
+        .navigation {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .nav-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .nav-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .nav-card p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .problem-section {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        }
+
+        .problem-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .problem-header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .problem-header h2 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .solution-header {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .solution-header h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .content-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .command-box {
+            background: #2d3748;
+            color: #68d391;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .warning-box::before {
+            content: "⚠️ ";
+            font-weight: bold;
+        }
+
+        .packet-tracer-box {
+            background: linear-gradient(135deg, #0984e3, #74b9ff);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .packet-tracer-box h4 {
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .back-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .step-list {
+            counter-reset: step-counter;
+        }
+
+        .step-list li {
+            counter-increment: step-counter;
+            margin: 15px 0;
+            padding-left: 40px;
+            position: relative;
+        }
+
+        .step-list li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #667eea;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .intro-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        }
+
+        .intro-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .osi-layer-info {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+    </style>
+    <script>
+        function showProblem(problemNumber) {
+            // Tüm problem section'ları gizle
+            const sections = document.querySelectorAll('.problem-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Navigation'ı gizle
+            document.getElementById('navigation').style.display = 'none';
+            document.getElementById('intro').style.display = 'none';
+            
+            // Seçilen problem'i göster
+            document.getElementById('problem' + problemNumber).classList.add('active');
+        }
+        
+        function showNavigation() {
+            // Tüm problem section'ları gizle
+            const sections = document.querySelectorAll('.problem-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Navigation'ı göster
+            document.getElementById('navigation').style.display = 'grid';
+            document.getElementById('intro').style.display = 'block';
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌐 L6 Presentation Layer</h1>
+            <p>Network Issues and Solutions - Comprehensive Admin Guide</p>
+        </div>
+
+        <div class="intro-section" id="intro">
+            <h2>OSI Layer 6 - What is the Presentation Layer?</h2>
+            <div class="osi-layer-info">
+                <h3>🎭 Presentation Layer </h3>
+                <p><strong>Functions:</strong></p>
+                <ul style="margin-top: 10px; padding-left: 20px;">
+                    <li>Data format conversion</li>
+                    <li>Encryption and decryption</li>
+                    <li>Data compression and decompression</li>
+                    <li>Character encoding (ASCII, Unicode)</li>
+                    <li>Data presentation and representation</li>
+                </ul>
+            </div>
+            
+            <div class="content-box">
+                <p>This layer enables data exchange between different systems. Data from the Application Layer is transformed into formats suitable for network transmission. Protocols like SSL/TLS encryption, JPEG/PNG image formats, and ZIP compression operate at this layer.</p>
+            </div>
+        </div>
+
+        <div class="navigation" id="navigation">
+            <div class="nav-card" onclick="showProblem(1)">
+                <h3>🔒 SSL/TLS Certificate Error</h3>
+                <p>Security certificate issues</p>
+            </div>
+            <div class="nav-card" onclick="showProblem(2)">
+                <h3>📊 Data Compression Problem</h3>
+                <p>Data compression issues</p>
+            </div>
+            <div class="nav-card" onclick="showProblem(3)">
+                <h3>🔡 Character Encoding Error</h3>
+                <p>Character encoding mismatches</p>
+            </div>
+            <div class="nav-card" onclick="showProblem(4)">
+                <h3>🖼️ Media Format Incompatibility</h3>
+                <p>Media format recognition issues</p>
+            </div>
+            <div class="nav-card" onclick="showProblem(5)">
+                <h3>🔐 Encryption Protocol Error</h3>
+                <p>Encryption protocol conflicts</p>
+            </div>
+            <div class="nav-card" onclick="showProblem(6)">
+                <h3>📝 MIME Type Problem</h3>
+                <p>Content type recognition errors</p>
+            </div>
+            <div class="nav-card" onclick="showProblem(7)">
+                <h3>🔄 Data Serialization Problem</h3>
+                <p>Data serialization issues</p>
+            </div>
+            <div class="nav-card" onclick="showProblem(8)">
+                <h3>🌐 Protocol Mismatch</h3>
+                <p>Protocol incompatibility issues</p>
+            </div>
+            <div class="nav-card" onclick="showProblem(9)">
+                <h3>📉 Compression Algorithm Conflict</h3>
+                <p>Compression algorithm conflict</p>
+            </div>
+            <div class="nav-card" onclick="showProblem(10)">
+                <h3>🔒 Cipher Suite Negotiation</h3>
+                <p>Cipher suite negotiation error</p>
+            </div>
+        </div>
+
+        <!-- Problem 1: SSL/TLS Certificate Error -->
+        <div class="problem-section" id="problem1">
+            <button class="back-button" onclick="showNavigation()">← Back to Main Menu</button>
+            
+            <div class="problem-header">
+                <h2>🔒 Problem 1: SSL/TLS Certificate Error</h2>
+                <p>Security certificate verification issues when accessing websites</p>
+            </div>
+
+            <div class="content-box">
+                <h4>Detailed Problem Description:</h4>
+                <p>SSL/TLS certificates are used to encrypt web traffic. If these certificates are expired, issued for the wrong domain, or signed by an untrusted CA, browsers will reject the connection and display a security warning to users.</p>
+
+                <p><strong>Common Error Messages:</strong></p>
+                <ul>
+                    <li>"Your connection is not private" (Chrome)</li>
+                    <li>"This connection is untrusted" (Firefox)</li>
+                    <li>"SSL_ERROR_BAD_CERT_DOMAIN"</li>
+                    <li>"NET::ERR_CERT_DATE_INVALID"</li>
+                </ul>
+            </div>
+
+            <div class="solution-header">
+                <h3>✅ Solution Steps</h3>
+            </div>
+
+            <div class="content-box">
+                <h4>Check Certificate Status:</h4>
+                <div class="command-box">
+# Sertifika bilgilerini kontrol et
+openssl s_client -connect example.com:443 -servername example.com
+
+# Sertifika süresini kontrol et
+echo | openssl s_client -connect example.com:443 2>/dev/null | openssl x509 -noout -dates
+
+# Domain uyumluluğunu kontrol et
+echo | openssl s_client -connect example.com:443 2>/dev/null | openssl x509 -noout -subject
+                </div>
+            </div>
+
+            <div class="content-box">
+                <h4>SSL Configuration on Cisco Router/Switch:</h4>
+                <ol class="step-list">
+                    <li>Create a self-signed certificate</li>
+                    <li>Enable HTTPS service</li>
+                    <li>Configure security settings</li>
+                </ol>
+                
+                <div class="command-box">
+Router(config)# crypto key generate rsa general-keys modulus 2048 label HTTPS-Key
+Router(config)# ip http secure-server
+Router(config)# ip http secure-port 443
+Router(config)# ip http authentication local
+                </div>
+            </div>
+
+            <div class="packet-tracer-box">
+                <h4>🎯 Cisco Packet Tracer Simulation</h4>
+                <p><strong>Scenario:</strong> SSL certificate configuration on a web server</p>
+                <ol class="step-list">
+                    <li>Add an HTTP Server in Packet Tracer</li>
+                    <li>Enable HTTPS from Services → HTTP menu</li>
+                    <li>Create a self-signed certificate</li>
+                    <li>Test HTTPS connection from Client PC</li>
+                    <li>Observe certificate error simulation</li>
+                </ol>
+               <p>
+                 <a href="L6_Problems_Simulations/ssl_certificate_problem.pkt" download>
+                   📥 Download ssl_certificate_problem.pkt
+                 </a>
+               </p>
+
+            </div>
+
+            <div class="warning-box">
+                <strong>Important Note:</strong> Avoid using self-signed certificates in production environments. Prefer certificates from trusted CAs (e.g., Let's Encrypt, DigiCert).
+            </div>
+        </div>
+
+        <!-- Problem 2: Data Compression Problem -->
+<div class="problem-section" id="problem2">
+    <button class="back-button" onclick="showNavigation()">← Back to Main Menu</button>
+
+    <div class="problem-header">
+        <h2>📊 Problem 2: Data Compression Problem</h2>
+        <p>HTTP gzip compression and web performance optimization issues</p>
+    </div>
+
+    <div class="content-box">
+        <h4>Detailed Problem Description:</h4>
+        <p>Web servers compress HTTP responses (gzip, deflate, brotli) to save bandwidth. If there's a mismatch in the compression algorithm between client and server, the content may not decode properly, resulting in rendering issues.</p>
+
+        <p><strong>Symptoms:</strong></p>
+        <ul>
+            <li>Garbled text appearance on web pages</li>
+            <li>Binary content display issues</li>
+            <li>"Content-Encoding error" messages</li>
+            <li>Slow page load times</li>
+        </ul>
+    </div>
+
+    <div class="solution-header">
+        <h3>✅ Solution Steps</h3>
+    </div>
+
+            <div class="content-box">
+                <h4>HTTP Header Analysis:</h4>
+                <div class="command-box">
+# Compression header'larını kontrol et
+curl -H "Accept-Encoding: gzip, deflate, br" -I http://example.com
+
+# Sıkıştırılmış response'u test et
+curl -H "Accept-Encoding: gzip" -v http://example.com
+
+# Wireshark ile HTTP traffic analizi
+# Filter: http.request.method == "GET" and http.content_encoding
+                </div>
+            </div>
+
+            <div class="content-box">
+                <h4>Web Server Configuration (Apache/Nginx):</h4>
+                <div class="command-box">
+# Apache mod_deflate yapılandırması
+LoadModule deflate_module modules/mod_deflate.so
+&lt;Location "/"&gt;
+    SetOutputFilter DEFLATE
+    SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png)$ no-gzip dont-vary
+&lt;/Location&gt;
+
+# Nginx gzip yapılandırması
+gzip on;
+gzip_vary on;
+gzip_min_length 1024;
+gzip_comp_level 6;
+gzip_types text/plain text/css application/json application/javascript;
+                </div>
+            </div>
+
+            <div class="packet-tracer-box">
+                <h4>🎯 Cisco Packet Tracer Simulation</h4>
+                <p><strong>Scenario:</strong> HTTP compression problem simulation</p>
+                <ol class="step-list">
+                    <li>Setup a web server and client PC</li>
+                    <li>Enable compression on the HTTP server</li>
+                    <li>Test with different content-encoding headers</li>
+                    <li>Analyze compression headers using packet capture</li>
+                    <li>Performance comparison (compressed vs uncompressed)</li>
+                </ol>
+                
+                <p>
+                  <a href="L6_Problems_Simulations/character_encoding_problem.pkt" download>
+                  📥 Download data_compression_problem.pkt
+                  </a>
+                </p>
+            </div>
+
+            <div class="warning-box">
+                <strong>Performance Tip:</strong> Only compress text-based content (HTML, CSS, JS). Binary files (images, videos) are already in compressed formats.
+            </div>
+        </div>
+
+        <!-- Problem 3: Character Encoding Error -->
+        <div class="problem-section" id="problem3">
+            <button class="back-button" onclick="showNavigation()">← Back to Main Menu</button>
+            
+            <div class="problem-header">
+                <h2>🔡 Problem 3: Character Encoding Error</h2>
+                <p>UTF-8, ASCII, and other character encoding mismatches</p>
+            </div>
+
+            <div class="content-box">
+                <h4>Detailed Problem Description:</h4>
+                <p>Character encoding mismatches often occur when transferring data between different systems, especially with texts containing special characters like Turkish (ç, ğ, ı, ö, ş, ü). Conversion errors arise between encodings such as UTF-8, ISO-8859-9, Windows-1254.</p>
+
+                <p><strong>Common Symptoms:</strong></p>
+                <ul>
+                    <li>Turkish characters appearing as "?"</li>
+                    <li>Garbled text (e.g., ÃƒÂ§)</li>
+                    <li>Encoding issues in emails</li>
+                    <li>Corrupted characters when fetching from database</li>
+               </ul>
+            </div>
+
+            <div class="solution-header">
+                <h3>✅ Solution Steps</h3>
+            </div>
+
+            <div class="content-box">
+                <h4>Encoding Detection and Conversion:</h4>
+                <div class="command-box">
+# Dosya encoding'ini tespit et
+file -bi filename.txt
+
+# Encoding dönüşümü
+iconv -f ISO-8859-9 -t UTF-8 input.txt > output.txt
+
+# Hex dump ile karakter analizi
+hexdump -C file.txt | head
+
+# Python ile encoding detection
+import chardet
+with open('file.txt', 'rb') as f:
+    result = chardet.detect(f.read())
+    print(result)
+                </div>
+            </div>
+
+            <div class="content-box">
+                <h4>Web Server HTTP Header Configuration:</h4>
+                <div class="command-box">
+# Apache .htaccess
+AddDefaultCharset UTF-8
+AddCharset UTF-8 .html .css .js .xml .json .rss .atom
+
+# Nginx yapılandırması
+charset UTF-8;
+charset_types text/xml text/plain text/vnd.wap.wml application/javascript application/rss+xml;
+
+# HTML meta tag
+&lt;meta charset="UTF-8"&gt;
+&lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;
+                </div>
+            </div>
+
+            <div class="content-box">
+                <h4>Database Encoding Ayarları:</h4>
+                <div class="command-box">
+# MySQL UTF-8 yapılandırması
+CREATE DATABASE mydb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+# PostgreSQL encoding kontrolü
+SHOW server_encoding;
+SHOW client_encoding;
+
+# Connection string'de encoding belirtme
+mysql --default-character-set=utf8mb4 -u user -p database
+                </div>
+            </div>
+
+            <div class="packet-tracer-box">
+                <h4>🎯 Cisco Packet Tracer Simulation</h4>
+                <p><strong>Scenario:</strong> Character encoding mismatch simulation</p>
+                <ol class="step-list">
+                    <li>Create HTML pages with different encodings on a web server</li>
+                    <li>Test UTF-8 and ISO-8859-9 pages in client browser</li>
+                    <li>Analyze Content-Type charset in HTTP headers</li>
+                    <li>Inspect raw HTTP requests/responses with Telnet</li>
+                    <li>Observe browser behavior on encoding conflicts</li>
+                </ol>
+               
+                <p>
+                  <a href="L6_Problems_Simulations/cipher_suite_negotiation.pkt" download>
+                  📥 Download character_encoding_problem.pkt
+                  </a>
+                </p>
+            </div>
+
+            <div class="warning-box">
+                <strong>Best Practice:</strong> Use consistent UTF-8 encoding across all systems. Specify the same encoding in your database, web server, application code, and HTML meta tags.
+            </div>
+        </div>
+
+        <!-- Problem 4: Media Format Compatibility -->
+        <div class="problem-section" id="problem4">
+            <button class="back-button" onclick="showNavigation()">← Back to Main Menu</button>
+            
+            <div class="problem-header">
+                <h2>🖼️ Problem 4: Media Format Incompatibility</h2>
+                <p>Video/audio codec and media format recognition issues</p>
+            </div>
+
+            <div class="content-box">
+                <h4>Detailed Problem Description:</h4>
+                <p>When sharing multimedia content, incompatibilities may arise due to different codecs and container formats. If browsers don't support specific video/audio formats or incorrect MIME types are used, the media content cannot be played properly.</p>
+
+                <p><strong>Common Format Issues:</strong></p>
+                <ul>
+                    <li>H.264 vs H.265 codec incompatibility</li>
+                    <li>Container format problems (WebM, MP4, AVI)</li>
+                    <li>Audio codec conflicts (AAC, MP3, OGG)</li>
+                    <li>Image format issues (JPEG, PNG, WebP, AVIF)</li>
+               </ul>
+            </div>
+
+            <div class="solution-header">
+                <h3>✅ Solution Steps</h3>
+            </div>
+
+            <div class="content-box">
+                <h4>Media Format Analysis:</h4>
+                <div class="command-box">
+# FFmpeg ile media info
+ffprobe -v quiet -print_format json -show_format -show_streams video.mp4
+
+# Media dosya detayları
+mediainfo video.mp4
+
+# Codec compatibility check
+ffmpeg -codecs | grep h264
+ffmpeg -formats | grep mp4
+
+# Browser compatibility test (JavaScript)
+const video = document.createElement('video');
+console.log(video.canPlayType('video/mp4; codecs="avc1.42E01E"'));
+console.log(video.canPlayType('video/webm; codecs="vp8, vorbis"'));
+                </div>
+            </div>
+
+            <div class="content-box">
+                <h4>Web Server MIME Type Configuration:</h4>
+                <div class="command-box">
+# Apache MIME types
+AddType video/mp4 .mp4
+AddType video/webm .webm
+AddType audio/mpeg .mp3
+AddType audio/ogg .ogg
+AddType image/webp .webp
+
+# Nginx MIME types
+location ~* \.(mp4|webm)$ {
+    add_header Content-Type video/mp4;
+    add_header Cache-Control "public, max-age=31536000";
+}
+
+# IIS web.config
+&lt;system.webServer&gt;
+  &lt;staticContent&gt;
+    &lt;mimeMap fileExtension=".mp4" mimeType="video/mp4" /&gt;
+    &lt;mimeMap fileExtension=".webm" mimeType="video/webm" /&gt;
+  &lt;/staticContent&gt;
+&lt;/system.webServer&gt;
+                </div>
+            </div>
+
+            <div class="content-box">
+                <h4>Media Transcoding Solutions:</h4>
+                <div class="command-box">
+# FFmpeg transcoding examples
+# MP4 to WebM conversion
+ffmpeg -i input.mp4 -c:v libvpx-vp9 -c:a libvorbis output.webm
+
+# Multiple format output
+ffmpeg -i source.avi -c:v libx264 -c:a aac output.mp4
+ffmpeg -i source.avi -c:v libvpx -c:a libvorbis output.webm
+
+# Image format conversion
+convert image.jpg -quality 80 image.webp
+cwebp -q 80 image.jpg -o image.webp
+                </div>
+            </div>
+
+            <div class="packet-tracer-box">
+                <h4>🎯 Cisco Packet Tracer Simulation</h4>
+                <p><strong>Scenario:</strong> Media streaming server configuration</p>
+                <ol class="step-list">
+                    <li>Host multimedia content on the HTTP server</li>
+                    <li>Serve files in different media formats</li>
+                    <li>Test MIME type configuration</li>
+                    <li>Simulate media content request from client</li>
+                    <li>Reproduce content-type header mismatch problem</li>
+               </ol>
+                <p>
+                 <a href="L6_Problems_Simulations/media_format_compatibility.pkt" download>
+                   📥 Download media_format_compatibility.pkt
+                 </a>
+                </p>
+
+            </div>
+
+            <div class="warning-box">
+               <strong>Modern Approach:</strong> For Progressive Web Apps, ensure support for multiple formats. Use fallback formats in HTML5 <video> and <audio> tags.
+            </div>
+        </div>
+
+        <!-- Problem 5: Encryption Protocol Error -->
+        <div class="problem-section" id="problem5">
+            <button class="back-button" onclick="showNavigation()">← Ana Menüye Dön</button>
+            
+            <div class="problem-header">
+                <h2>🔐 Problem 5: Encryption Protocol Error</h2>
+                <p>Encryption protocol conflicts and TLS handshake issues</p>
+            </div>
+
+            <div class="content-box">
+                <h4>Detailed Problem Description:</h4>
+                <p>When the supported encryption algorithms between a client and server do not match during a TLS/SSL handshake, the connection cannot be established. Older TLS versions, weak cipher suites, or version mismatches are typical causes.</p>
+
+                <p><strong>Common Errors:</strong></p>
+                <ul>
+                    <li>TLS version mismatch (1.0, 1.1, 1.2, 1.3)</li>
+                    <li>Weak cipher suite rejection</li>
+                    <li>Certificate chain validation errors</li>
+                    <li>Perfect Forward Secrecy (PFS) requirements</li>
+               </ul>
+            </div>
+
+            <div class="solution-header">
+                <h3>✅ Solution Steps</h3>
+            </div>
+
+            <div class="content-box">
+                <h4>TLS Configuration Analysis:</h4>
+                <div class="command-box">
+# TLS handshake test
+openssl s_client -connect example.com:443 -tls1_2
+openssl s_client -connect example.com:443 -tls1_3
+
+# Cipher suite enumeration
+nmap --script ssl-enum-ciphers -p 443 example.com
+
+# SSL Labs test equivalent
+testssl.sh --protocols --ciphers example.com:443
+                </div>
+            </div>
+
+            <div class="packet-tracer-box">
+                <h4>🎯 Cisco Packet Tracer Simulation</h4>
+                <p><strong>Scenario:</strong> TLS protocol negotiation failure</p>
+                <ol class="step-list">
+                    <li>Configure different TLS versions on the web server</li>
+                    <li>Simulate a connection attempt from the client</li>
+                    <li>Analyze handshake failure</li>
+                    <li>Prevent protocol downgrade attacks</li>
+                </ol>
+                <p>
+                  <a href="L6_Problems_Simulations/encryption_protocol_error.pkt" download>
+                    📥 Download encryption_protocol_error.pkt
+                  </a>
+                </p>
+
+            </div>
+        </div>
+
+        <!-- Problem 6: MIME Type Problem -->
+        <div class="problem-section" id="problem6">
+            <button class="back-button" onclick="showNavigation()">← Back to Main Menu</button>
+            
+            <div class="problem-header">
+                <h2>📝 Problem 6: MIME Type Problem</h2>
+                <p>Content type recognition errors and browser rendering issues</p>
+            </div>
+
+            <div class="content-box">
+                <h4>Detailed Problem Description:</h4>
+                <p>Web servers send a MIME type header based on the file extension. If the wrong MIME type is sent, the browser cannot render the content correctly. For example, if a CSS file is served as text/plain, styling will not be applied.</p>
+
+                <p><strong>Common MIME Type Errors:</strong></p>
+                <ul>
+                    <li>text/css served as text/plain</li>
+                    <li>application/javascript served as text/html</li>
+                    <li>image/jpeg served as application/octet-stream</li>
+                    <li>application/json replaced with text/html in JSON APIs</li>
+                </ul>
+            </div>
+
+            <div class="solution-header">
+                <h3>✅ Solution Steps</h3>
+            </div>
+
+            <div class="content-box">
+                <h4>MIME Type Configuration:</h4>
+                <div class="command-box">
+# Apache MIME types check
+grep -r "AddType" /etc/apache2/
+cat /etc/mime.types | grep css
+
+# Nginx MIME configuration
+location ~* \.css$ {
+    add_header Content-Type text/css;
+}
+
+# HTTP response header verification
+curl -I http://example.com/style.css
+wget --server-response http://example.com/script.js
+                </div>
+            </div>
+
+            <div class="packet-tracer-box">
+                <h4>🎯 Cisco Packet Tracer Simulation</h4>
+                <p><strong>Scenario:</strong> MIME type misconfiguration testing</p>
+                <ol class="step-list">
+                    <li>Host CSS/JS files on a web server</li>
+                    <li>Apply incorrect MIME type configuration</li>
+                    <li>Simulate browser rendering failure</li>
+                    <li>Correct the Content-Type header</li>
+                </ol>
+                <p>
+                  <a href="L6_Problems_Simulations/mime_type_problem.pkt" download>
+                    📥 Download mime_type_problem.pkt
+                  </a>
+                </p>
+
+            </div>
+        </div>
+
+        <!-- Problem 7: Data Serialization Problem -->
+        <div class="problem-section" id="problem7">
+            <button class="back-button" onclick="showNavigation()">← Back to Main Menu</button>
+            
+            <div class="problem-header">
+                <h2>🔄 Problem 7: Data Serialization Problem</h2>
+                <p>Data serialization and format conversion issues</p>
+            </div>
+
+            <div class="content-box">
+                <h4>Detailed Problem Description:</h4>
+                <p>APIs exchange data using formats like JSON, XML, or Protocol Buffers. Incompatibilities between formats, schema validation errors, and versioning problems can cause data corruption or failures in communication.</p>
+
+                <p><strong>Serialization Issues:</strong></p>
+                <ul>
+                    <li>JSON syntax errors and malformed data</li>
+                    <li>XML schema validation failures</li>
+                    <li>Binary serialization compatibility issues</li>
+                    <li>API versioning and backward compatibility problems</li>
+                </ul>
+            </div>
+
+            <div class="solution-header">
+                <h3>✅ Solution Steps</h3>
+            </div>
+
+            <div class="content-box">
+                <h4>Data Format Validation:</h4>
+                <div class="command-box">
+# JSON validation
+python -m json.tool data.json
+cat data.json | jq .
+
+# XML validation
+xmllint --valid document.xml
+xmlstarlet val -e document.xml
+
+# API response format check
+curl -H "Accept: application/json" http://api.example.com/data
+curl -H "Accept: application/xml" http://api.example.com/data
+                </div>
+            </div>
+
+            <div class="packet-tracer-box">
+                <h4>🎯 Cisco Packet Tracer Simulation</h4>
+                <p><strong>Scenario:</strong> API data serialization mismatch</p>
+                <ol class="step-list">
+                    <li>Set up a REST API server</li>
+                    <li>Configure responses in JSON/XML formats</li>
+                    <li>Negotiate client request formats</li>
+                    <li>Handle serialization errors</li>
+                </ol>
+                <p>
+                  <a href="L6_Problems_Simulations/data_serialization_issue.pkt" download>
+                    📥 Download data_serialization_issue.pkt
+                  </a>
+                </p>
+
+            </div>
+        </div>
+
+        <!-- Problem 8: Protocol Mismatch -->
+        <div class="problem-section" id="problem8">
+            <button class="back-button" onclick="showNavigation()">← Back to Main Menu</button>
+            
+            <div class="problem-header">
+                <h2>🌐 Problem 8: Protocol Mismatch</h2>
+                <p>Protocol incompatibility issues and version conflicts</p>
+            </div>
+
+            <div class="content-box">
+                 <h4>Detailed Problem Description:</h4>
+                 <p>Version mismatches between different network devices can lead to communication failures. Examples include differences in HTTP versions (1.1 vs 2), SNMP (v1/v2c/v3), and SSH protocol versions.</p>
+
+                 <p><strong>Types of Protocol Mismatch:</strong></p>
+                 <ul>
+                     <li>HTTP version negotiation failures</li>
+                     <li>SNMP version compatibility issues</li>
+                     <li>SSH protocol version conflicts</li>
+                     <li>API versioning incompatibilities</li>
+                 </ul>
+            </div>
+
+            <div class="solution-header">
+                <h3>✅ Solution Steps</h3>
+            </div>
+
+            <div class="content-box">
+                <h4>Protocol Version Analysis:</h4>
+                <div class="command-box">
+# HTTP version check
+curl -I --http1.1 http://example.com
+curl -I --http2 https://example.com
+
+# SNMP version test
+snmpget -v1 -c public 192.168.1.1 1.3.6.1.2.1.1.1.0
+snmpget -v2c -c public 192.168.1.1 1.3.6.1.2.1.1.1.0
+
+# SSH protocol version
+ssh -o Protocol=2 user@server
+                </div>
+            </div>
+
+            <div class="packet-tracer-box">
+                <h4>🎯 Cisco Packet Tracer Simulation</h4>
+                <p><strong>Scenario:</strong> Protocol version negotiation failure</p>
+                <ol class="step-list">
+                    <li>Set up multiple devices with different protocol versions</li>
+                    <li>Simulate communication attempts</li>
+                    <li>Analyze version mismatch errors</li>
+                    <li>Configure backward compatibility</li>
+                </ol>
+                <p>
+                  <a href="L6_Problems_Simulations/protocol_mismatch.pkt" download>
+                    📥 Download protocol_mismatch.pkt
+                  </a>
+                </p>
+
+            </div>
+        </div>
+
+        <!-- Problem 9: Compression Algorithm Conflict -->
+        <div class="problem-section" id="problem9">
+            <button class="back-button" onclick="showNavigation()">← Back to Main Menu</button>
+            
+            <div class="problem-header">
+                <h2>📉 Problem 9: Compression Algorithm Conflict</h2>
+                <p>Compression algorithm conflict and performance issues</p>
+            </div>
+
+            <div class="content-box">
+                <h4>Detailed Problem Description:</h4>
+                <p>When the client and server do not support the same compression algorithms, content transfer errors can occur. Negotiation failures between gzip, deflate, and Brotli algorithms fall into this category.</p>
+
+                <p><strong>Compression Conflicts:</strong></p>
+                <ul>
+                    <li>Unsupported compression algorithm requests</li>
+                    <li>Compression level mismatch issues</li>
+                    <li>Binary content compression errors</li>
+                    <li>Compression header parsing failures</li>
+                </ul>
+            </div>
+
+            <div class="solution-header">
+                <h3>✅ Solution Steps</h3>
+            </div>
+
+            <div class="content-box">
+                <h4>Compression Algorithm Testing:</h4>
+                <div class="command-box">
+# Compression support test
+curl -H "Accept-Encoding: gzip" -v http://example.com
+curl -H "Accept-Encoding: br" -v https://example.com
+
+# Compression ratio analysis
+gzip -c file.txt | wc -c
+brotli -c file.txt | wc -c
+
+# Apache compression config
+a2enmod deflate
+a2enmod brotli
+                </div>
+            </div>
+
+            <div class="packet-tracer-box">
+                <h4>🎯 Cisco Packet Tracer Simulation</h4>
+                <p><strong>Scenario:</strong> HTTP compression negotiation failure</p>
+                <ol class="step-list">
+                    <li>Configure compression on the web server</li>
+                    <li>Simulate client compression capabilities</li>
+                    <li>Reproduce algorithm mismatch errors</li>
+                    <li>Test fallback mechanisms</li>
+                </ol>
+                <p>
+                  <a href="L6_Problems_Simulations/compression_algorithm_conflict.pkt" download>
+                    📥 Download compression_algorithm_conflict.pkt
+                  </a>
+                </p>
+
+            </div>
+        </div>
+
+        <!-- Problem 10: Cipher Suite Negotiation -->
+        <div class="problem-section" id="problem10">
+            <button class="back-button" onclick="showNavigation()">← Back to Main Menu</button>
+            
+            <div class="problem-header">
+                <h2>🔒 Problem 10: Cipher Suite Negotiation</h2>
+                <p>Cipher suite negotiation error and security protocol issues</p>
+            </div>
+
+            <div class="content-box">
+                <h4>Detailed Problem Description:</h4>
+                <p>During the TLS handshake, if the client and server do not support a common set of cipher suites, a secure connection cannot be established. Modern security standards reject weak ciphers, which can cause issues when integrating with legacy systems.</p>
+
+                <p><strong>Cipher Suite Issues:</strong></p>
+                <ul>
+                    <li>Weak cipher rejection (RC4, DES, MD5)</li>
+                    <li>Perfect Forward Secrecy requirement</li>
+                    <li>AEAD cipher preference issues</li>
+                    <li>Legacy system compatibility conflicts</li>
+                </ul>
+            </div>
+
+            <div class="solution-header">
+                <h3>✅ Solution Steps</h3>
+            </div>
+
+            <div class="content-box">
+                <h4>Cipher Suite Analysis:</h4>
+                <div class="command-box">
+# Supported cipher suites
+openssl ciphers -v 'ALL:COMPLEMENTOFALL'
+openssl s_client -connect example.com:443 -cipher 'ECDHE-RSA-AES256-GCM-SHA384'
+
+# Server cipher configuration
+# Apache SSL
+SSLCipherSuite ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384
+
+# Nginx SSL
+ssl_ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+ssl_prefer_server_ciphers on;
+                </div>
+            </div>
+
+            <div class="packet-tracer-box">
+                <h4>🎯 Cisco Packet Tracer Simulation</h4>
+                <p><strong>Scenario:</strong> TLS cipher suite negotiation failure</p>
+                <ol class="step-list">
+                    <li>Configure HTTPS server cipher suites</li>
+                    <li>Simulate client cipher preferences</li>
+                    <li>Trigger handshake failure due to mismatch</li>
+                    <li>Balance security and compatibility</li>
+                </ol>
+                <p>
+                  <a href="L6_Problems_Simulations/cipher_suite_negotiation.pkt" download>
+                    📥 Download cipher_suite_negotiation.pkt
+                  </a>
+                </p>
+
+            </div>
+
+            <div class="warning-box">
+                <strong>Security Recommendation:</strong> Prefer modern cipher suites. Use TLS 1.3 and algorithms that support Perfect Forward Secrecy.
+            </div>
+        </div>
